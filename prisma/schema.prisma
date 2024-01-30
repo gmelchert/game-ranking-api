@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(uuid())
+  password      String
+  image         String?
+  steam         String
+  name          String          @unique
+  discord       String          @default("NOT_FOUND")
+  email         String          @unique
+  CounterStrike CounterStrike[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  admin         Boolean         @default(false)
+
+  @@map("users")
+}
+
+model CounterStrike {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  kills     Int
+  deaths    Int
+  dmr       Int
+  createdAt DateTime @default(now())
+
+  @@map("counter_strike")
+}
