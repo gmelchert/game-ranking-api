@@ -1,9 +1,11 @@
-import { UsersService } from "./users.service";
 import { Get, Put, Delete } from "../../../RouteBuilder";
 
+import { UsersService } from "./users.service";
+
 import { IControllerRouteModel } from "../../shared/models";
-import { t } from 'elysia';
 import { IUserModel } from "./users.model";
+
+import { findUniqueParamsDto, updateBodyDto } from "./dto";
 
 export class GetUsersController extends Get('/users', UsersService, {
     protected: {
@@ -14,11 +16,7 @@ export class GetUsersController extends Get('/users', UsersService, {
     valueValidator: {
         forRoutes: [{
             path: '/find/:id',
-            params: t.Object({
-                id: t.String({
-                    format: 'uuid',
-                }),
-            }),
+            params: findUniqueParamsDto,
         }],
     },
 }) {
@@ -33,35 +31,35 @@ export class GetUsersController extends Get('/users', UsersService, {
     async '/find/:id'({ service, elysia }: IControllerRouteModel<UsersService>) {
         const userId = elysia.params.id;
 
+        const user = await service.findUnique(userId);
+
         return {
-            userId
+            data: user,
+            message: 'User found.'
+        }
+    }
+
+    async '/profile'({ elysia, service }: IControllerRouteModel<UsersService>) {
+        const user = elysia.userJWT;
+
+        const counterStrike = await service.getFirstCounterStrikeStats(user.id);
+
+        return {
+            data: {
+                user,
+                counterStrike,
+            },
+            message: 'Your profile.',
         }
     }
 }
 
-export class PutUsersController extends Put('/user', UsersService, {
+export class PutUsersController extends Put('/users', UsersService, {
     protected: {},
     valueValidator: {
         forRoutes: [{
             path: '',
-            body: t.Object({
-                image: t.Optional(t.String({
-                    error: "Image",
-                })),
-                steam: t.Optional(t.String({
-                    error: "Steam",
-                })),
-                email: t.Optional(t.String({
-                    format: "email",
-                    error: "Email",
-                })),
-                name: t.Optional(t.String({
-                    error: "Name",
-                })),
-                discord: t.Optional(t.String({
-                    error: "Discord",
-                })),
-            })
+            body: updateBodyDto,
         }]
     }
 }) {
@@ -75,5 +73,19 @@ export class PutUsersController extends Put('/user', UsersService, {
             data: user,
             message: "User updated.",
         })
+    }
+}
+
+export class DeleteUsersController extends Delete('/users', UsersService, {
+    protected: {},
+}) {
+    async '/profile'({ service, elysia }: IControllerRouteModel<UsersService>) {
+        const { id: userId } = elysia.userJWT;
+
+        await service.deleteProfile(userId);
+
+        return {
+            message: "User deleted.",
+        }
     }
 }

@@ -1,10 +1,19 @@
 import { t } from "elysia";
-import { Get, Post } from "../../../RouteBuilder";
-import { BodyValidatorType } from "../../../RouteBuilder/interfaces/routeEnum/body-validator.enum";
-import { RouteMethods } from "../../../RouteBuilder/interfaces/routeEnum/route-methods.enum";
-import { IControllerRouteModel } from "../../shared/models";
-import { ICounterStrikeModel } from "./counter-strike.model";
+
+import { Get, Post, Put, Delete } from "../../../RouteBuilder";
+
 import { CounterStrikeService } from "./counter-strike.service";
+
+import { IControllerRouteModel } from "../../shared/models";
+import { ICounterStrikeDto, ICounterStrikeModel } from "./counter-strike.model";
+
+import {
+    findUniqueParamsDto,
+    createBodyDto,
+    updateBodyDto,
+    updateParamsDto,
+    deleteParamsDto,
+} from "./dto";
 
 export class GetCounterStrikeController extends Get('/counter-strike', CounterStrikeService, {
     protected: {
@@ -15,11 +24,7 @@ export class GetCounterStrikeController extends Get('/counter-strike', CounterSt
     valueValidator: {
         forRoutes: [{
             path: '/find/:id',
-            query: t.Object({
-                id: t.String({
-                    format: 'uuid',
-                }),
-            }),
+            query: findUniqueParamsDto,
         }],
     },
 }) {
@@ -48,11 +53,7 @@ export class PostCounterStrikeControlle extends Post('/counter-strike', CounterS
     valueValidator: {
         forRoutes: [{
             path: '',
-            body: t.Object({
-                deaths: t.Number(),
-                dmr: t.Number(),
-                kills: t.Number(),
-            }),
+            body: createBodyDto,
         }],
     },
 }) {
@@ -78,6 +79,51 @@ export class PostCounterStrikeControlle extends Post('/counter-strike', CounterS
             data,
             message: "Stat created with success.",
             status: 201,
+        }
+    }
+}
+
+export class PutCounterStrikeService extends Put('/counter-strike', CounterStrikeService, {
+    protected: {},
+    valueValidator: {
+        forRoutes: [{
+            path: '/:id',
+            body: updateBodyDto,
+            params: updateParamsDto,
+        }],
+    },
+}) {
+    async '/:id'({ elysia, service }: IControllerRouteModel<CounterStrikeService>) {
+        const { id: userId } = elysia.userJWT;
+        const id = elysia.params.id;
+        const body = elysia.body as Partial<ICounterStrikeDto>
+
+        const data = await service.update(userId, id, body);
+
+        return {
+            message: "Stat updated.",
+            data,
+        }
+    }
+}
+
+export class DeleteCounterStrikeController extends Delete('/counter-strike', CounterStrikeService, {
+    protected: {},
+    valueValidator: {
+        forRoutes: [{
+            path: '/:id',
+            params: deleteParamsDto,
+        }]
+    }
+}) {
+    async '/:id'({ service, elysia }: IControllerRouteModel<CounterStrikeService>) {
+        const { id: userId } = elysia.userJWT;
+        const id = elysia.params.id;
+
+        await service.delete(userId, id);
+
+        return {
+            message: "Counter Strike stat deleted."
         }
     }
 }

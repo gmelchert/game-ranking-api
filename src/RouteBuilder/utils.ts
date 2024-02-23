@@ -48,7 +48,7 @@ export class RouterBuilder {
                     method: route.method,
                     service: route.service,
                     routeConfigs: route.routeConfigs,
-                    functionName
+                    functionName,
                 })
             )
         }
@@ -98,15 +98,16 @@ export class RouterBuilder {
             query,
             error({ error, code }) {
                 if (code === 'VALIDATION') {
-                    console.log(error.all)
                     const errors: Array<{ field: string; errors: string[] }> = [];
 
                     error.all.forEach(err => {
-                        const errorsObject = errors.find(({ field }) => field === err.schema.error.toLowerCase());
+                        const fieldToLowerCase = err?.path?.replace('/' ,'') ?? ''
+
+                        const errorsObject = errors.find(({ field }) => field === fieldToLowerCase);
                         if (errorsObject) {
                             return errorsObject.errors.push(err.message)
                         }
-                        errors.push({ field: err.schema.error.toLowerCase(), errors: [err.message] })
+                        errors.push({ field: fieldToLowerCase, errors: [err.message] })
                     })
 
                     return {

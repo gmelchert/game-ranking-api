@@ -2,12 +2,12 @@ import { PrismaClient } from "@prisma/client";
 import { IUserModel, IUserVisibleFieldsModel } from "./users.model";
 
 export class UsersService {
-    userVisibleFields: IUserVisibleFieldsModel;
-
     constructor(
         private readonly prisma: PrismaClient
-    ) {
-        this.userVisibleFields = {
+    ) {}
+
+    private get userVisibleFields(): IUserVisibleFieldsModel {
+        return {
             id: true,
             image: true,
             name: true,
@@ -35,10 +35,30 @@ export class UsersService {
             return user;
         } catch (err) {
             throw {
-                message: "Failed to find user by ID.",
+                message: "Failed to find user.",
                 err,
                 status: 500,
             }
+        }
+    }
+
+    async getFirstCounterStrikeStats(userId: string) {
+        try {
+            const counterStrikeStats = await this.prisma.counterStrike.findMany({
+                where: { userId },
+                take: 10,
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            })
+
+            return counterStrikeStats;
+        } catch (error) {
+            throw ({
+                success: false,
+                message: "Failed to find stats for Counter-Strike.",
+                status: 500,
+            })
         }
     }
 
@@ -75,6 +95,20 @@ export class UsersService {
             throw {
                 message: "Failed to update user.",
                 err,
+                status: 500,
+            }
+        }
+    }
+
+    async deleteProfile(id: string) {
+        try {
+            await this.prisma.user.delete({
+                where: { id }
+            });
+        } catch (error) {
+            throw {
+                message: "Failed to delete profile.",
+                error,
                 status: 500,
             }
         }

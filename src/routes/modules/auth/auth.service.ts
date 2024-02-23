@@ -1,7 +1,7 @@
 import Bun from 'bun';
-import { PrismaClient } from "@prisma/client";
 
-import { extractTokenFromHeader } from "../../shared/authorization";
+import { PrismaClient } from '@prisma/client';
+
 import { IUserModel } from '../users/users.model';
 
 export class AuthService {

@@ -1,69 +1,26 @@
-import { Get, Post } from "../../../RouteBuilder";
-
-import { IAuthModel } from "./auth.model";
 import { AuthService } from "./auth.service";
 
-import { t } from "elysia";
+import { Get, Post } from "../../../RouteBuilder";
 
 import { IControllerRouteModel } from "../../shared/models";
-import { IUserModel } from "../users/users.model";
+import { IAuthModel } from "./auth.model";
+import { IUserModel } from "../users/users.model"; 
 
-export class GetAuthController extends Get('/auth', AuthService, {
-    protected: {}
-}) {
-    async '/me'({ service, elysia }: IControllerRouteModel<AuthService>) {
-        const { userJWT: user } = elysia;
-
-        const counterStrike = await service.getAuthenticatedUser(user.id);
-
-        return ({
-            data: {
-                user,
-                counterStrike,
-            }
-        });
-    }
-}
+import {
+    signInBodyDto,
+    signOnBodyDto
+} from "./dto";
 
 export class PostAuthController extends Post('/auth', AuthService, {
     valueValidator: {
         forRoutes: [
             {
                 path: '/sign-in',
-                body: t.Object({
-                    login: t.String({
-                        error: "Login is required and must be a string.",
-                    }),
-                    password: t.String({
-                        minLength: 6,
-                        error: "Password is required and must be a string with at least 6 characters.",
-                    }),
-                }),
+                body: signInBodyDto,
             },
             {
                 path: '/sign-on',
-                body: t.Object({
-                    name: t.String({
-                        error: "Name",
-                    }),
-                    email: t.String({
-                        format: "email",
-                        error: "Email",
-                    }),
-                    steam: t.String({
-                        error: "Steam",
-                    }),
-                    discord: t.Optional(t.String({
-                        error: "Discord",
-                    })),
-                    image: t.Optional(t.String({
-                        error: "Image",
-                    })),
-                    password: t.String({
-                        minLength: 6,
-                        error: "Password",
-                    }),
-                })
+                body: signOnBodyDto
             }
         ]
     }
