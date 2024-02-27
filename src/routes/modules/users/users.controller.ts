@@ -66,11 +66,16 @@ export class PutUsersController extends Put('/users', UsersService, {
     async ''({ service, elysia }: IControllerRouteModel<UsersService>) {
         const { id } = elysia.userJWT;
         const data = elysia.body as Partial<IUserModel>;
+        const { jwt } = elysia;
 
         const user = await service.update(id, data);
+        const accessToken = await jwt.sign(user);
 
         return ({
-            data: user,
+            data: {
+                user,
+                accessToken,
+            },
             message: "User updated.",
         })
     }

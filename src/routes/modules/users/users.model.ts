@@ -18,4 +18,5 @@ export interface IUserVisibleFieldsModel {
     name?: boolean;
     discord?: boolean;
     email?: boolean;
+    createdAt?: boolean;
 }

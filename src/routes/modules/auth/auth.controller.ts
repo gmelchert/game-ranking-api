@@ -37,7 +37,10 @@ export class PostAuthController extends Post('/auth', AuthService, {
         const accessToken = await jwt.sign(user);
 
         return {
-            data: accessToken,
+            data: {
+                accessToken,
+                user,
+            },
         }
     }
 

@@ -14,6 +14,7 @@ export class UsersService {
             steam: true,
             discord: true,
             email: true,
+            createdAt: true,
         }
     }
 
