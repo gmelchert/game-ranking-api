@@ -22,14 +22,31 @@ export class GetCounterStrikeController extends Get('/counter-strike', CounterSt
         }],
     },
     valueValidator: {
-        forRoutes: [{
-            path: '/find/:id',
-            query: findUniqueParamsDto,
-        }],
+        forRoutes: [
+            {
+                path: '/find/:id',
+                params: findUniqueParamsDto,
+            },
+            {
+                path: '/latest',
+                params: findUniqueParamsDto,
+            }
+        ],
     },
 }) {
     async ''({ service, elysia }: IControllerRouteModel<CounterStrikeService>) {
         const data = await service.findAll();
+
+        return {
+            data,
+            message: "Stats for Counter-Strike.",
+        }
+    }
+
+    async '/latest'({ service, elysia }: IControllerRouteModel<CounterStrikeService>) {
+        const page = elysia.query.page || 1;
+        
+        const data = await service.findLatest(+page);
 
         return {
             data,
@@ -72,7 +89,7 @@ export class PostCounterStrikeControlle extends Post('/counter-strike', CounterS
             userId,
             deaths,
             dmr,
-            kills
+            kills,
         });
 
         return {

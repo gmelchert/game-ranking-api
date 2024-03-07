@@ -31,6 +31,26 @@ export class CounterStrikeService {
         }
     }
 
+    async findLatest(page: number) {
+        try {
+            const stats = await this.prisma.counterStrike.findMany({
+                take: 20,
+                skip: 20 * (page - 1),
+                orderBy: {
+                    createdAt: 'desc',
+                }
+            });
+
+            return stats;
+        } catch (error) {
+            throw ({
+                message: "Failed to get Counter Strike stats.",
+                status: 500,
+                error,
+            })
+        }
+    }
+
     async findUnique(id: string) {
         try {
             const stats = await this.prisma.counterStrike.findUnique({
