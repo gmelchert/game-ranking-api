@@ -45,7 +45,7 @@ export class GetCounterStrikeController extends Get('/counter-strike', CounterSt
 
     async '/latest'({ service, elysia }: IControllerRouteModel<CounterStrikeService>) {
         const page = elysia.query.page || 1;
-        
+
         const data = await service.findLatest(+page);
 
         return {
@@ -83,6 +83,8 @@ export class PostCounterStrikeControlle extends Post('/counter-strike', CounterS
             deaths,
             dmr,
             kills,
+            won,
+            map,
         } = elysia.body as ICounterStrikeModel;
 
         const data = await service.create({
@@ -90,6 +92,8 @@ export class PostCounterStrikeControlle extends Post('/counter-strike', CounterS
             deaths,
             dmr,
             kills,
+            won,
+            map,
         });
 
         return {

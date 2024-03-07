@@ -10,4 +10,10 @@ export const createBodyDto = t.Object({
     kills: t.Number({
         error: 'kills'
     }),
+    map: t.String({
+        error: 'map'
+    }),
+    won: t.Boolean({
+        error: 'map'
+    }),
 })

@@ -4,7 +4,7 @@ import { ICounterStrikeDto, ICounterStrikeVisibleFields } from "./counter-strike
 export class CounterStrikeService {
     constructor(
         private readonly prisma: PrismaClient
-    ) {}
+    ) { }
 
     private get visibleFields(): ICounterStrikeVisibleFields {
         return ({
@@ -13,15 +13,31 @@ export class CounterStrikeService {
             kills: true,
             userId: true,
             createdAt: true,
+            map: true,
+            won: true,
             id: true,
         })
     }
 
     async findAll() {
         try {
-            const stats = await this.prisma.counterStrike.findMany();
+            const [total_items, stats] = await this.prisma.$transaction([
+                this.prisma.counterStrike.count(),
+                this.prisma.counterStrike.findMany({
+                    select: {
+                        ...this.visibleFields,
+                        user: {
+                            select: {
+                                name: true,
+                                steam: true,
+                                image: true,
+                            }
+                        }
+                    }
+                })
+            ]);
 
-            return stats;
+            return { stats, total_items };
         } catch (error) {
             throw ({
                 message: "Failed to get Counter Strike stats.",
@@ -33,15 +49,28 @@ export class CounterStrikeService {
 
     async findLatest(page: number) {
         try {
-            const stats = await this.prisma.counterStrike.findMany({
-                take: 20,
-                skip: 20 * (page - 1),
-                orderBy: {
-                    createdAt: 'desc',
-                }
-            });
+            const [total_items, stats] = await this.prisma.$transaction([
+                this.prisma.counterStrike.count(),
+                this.prisma.counterStrike.findMany({
+                    take: 20,
+                    skip: 20 * (page - 1),
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
+                    select: {
+                        ...this.visibleFields,
+                        user: {
+                            select: {
+                                name: true,
+                                steam: true,
+                                image: true,
+                            }
+                        }
+                    }
+                })
+            ]);
 
-            return stats;
+            return { stats, total_items };
         } catch (error) {
             throw ({
                 message: "Failed to get Counter Strike stats.",
@@ -91,7 +120,7 @@ export class CounterStrikeService {
                 where: { id, userId },
                 select: this.visibleFields,
             })
-    
+
             return stat;
         } catch (error) {
             throw ({

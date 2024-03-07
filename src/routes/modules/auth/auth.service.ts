@@ -6,8 +6,8 @@ import { IUserModel } from '../users/users.model';
 
 export class AuthService {
     unauthorizedError: {
-        message: "Username or password is wrong.",
-        status: 401,
+        message: "Username or password is wrong.";
+        status: 401;
     }
 
     constructor(

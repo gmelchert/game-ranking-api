@@ -4,7 +4,7 @@ import { Get, Post } from "../../../RouteBuilder";
 
 import { IControllerRouteModel } from "../../shared/models";
 import { IAuthModel } from "./auth.model";
-import { IUserModel } from "../users/users.model"; 
+import { IUserModel } from "../users/users.model";
 
 import {
     signInBodyDto,
@@ -62,7 +62,7 @@ export class PostAuthController extends Post('/auth', AuthService, {
         const accessToken = await jwt.sign(user);
 
         return {
-            data: { accessToken },
+            data: { accessToken, user },
             message: "User created with success.",
         }
     }

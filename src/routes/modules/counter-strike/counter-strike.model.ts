@@ -7,6 +7,8 @@ export interface ICounterStrikeModel {
     kills: number;
     deaths: number;
     dmr: number;
+    map: string;
+    won: boolean;
     createdAt?: Date;
 }
 
@@ -15,6 +17,8 @@ export interface ICounterStrikeDto {
     kills: number;
     deaths: number;
     dmr: number;
+    map: string;
+    won: boolean;
 }
 
 export interface ICounterStrikeVisibleFields {
@@ -24,5 +28,7 @@ export interface ICounterStrikeVisibleFields {
     kills: boolean;
     deaths: boolean;
     dmr: boolean;
+    map: boolean;
+    won: boolean;
     createdAt?: boolean;
 }

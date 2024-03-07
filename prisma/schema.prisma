@@ -33,6 +33,8 @@ model CounterStrike {
   kills     Int
   deaths    Int
   dmr       Int
+  map       String
+  won       Boolean
   createdAt DateTime @default(now())
 
   @@map("counter_strike")

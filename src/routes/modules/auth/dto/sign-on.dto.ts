@@ -14,9 +14,9 @@ export const signOnBodyDto = t.Object({
     discord: t.Optional(t.String({
         error: "Discord",
     })),
-    image: t.Optional(t.String({
+    image: t.String({
         error: "Image",
-    })),
+    }),
     password: t.String({
         minLength: 6,
         error: "Password",
